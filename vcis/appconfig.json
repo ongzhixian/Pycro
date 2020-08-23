@@ -1,0 +1,24 @@
+{
+    "application": {
+        "application_name"  : "vcis",
+        "description"       : "Verified Credentials Identity Service",
+        "version"           : "0.1",
+        "version_date"      : "2020-08-23",
+        "email_sender"      : "no-reply@vcis.plato.emptool.com"
+    },
+    "url_dump": {
+        "sqlite3_filename"  : "./run/sqlite3/url_kb.sqlite3"
+    },
+    "runtime_environment"   : {
+        "acadian" : {
+            "src_dir"   : "D:/src/github.com/ongzhixian/Pycro/code/vcis",
+            "temp_dir"  : "D:/temp"
+        },
+        "zoga330" : {
+            "src_dir"   : "C:/src/github.com/ongzhixian/Pycro/code/vcis",
+            "temp_dir"  : "C:/src/temp"
+        }
+
+    }
+
+}
