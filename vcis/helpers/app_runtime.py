@@ -14,20 +14,20 @@ from jinja2 import Template, Environment, FileSystemLoader
 ########################################
 
 def get_config_json():
-    logging.debug("Opening appconfig.json")
-    appconfig_file = open( 'appconfig.json' )
-    logging.debug("Loading appconfig.json")
-    appconfig = json.load( appconfig_file )
+    logging.debug("Opening config.json")
+    app_config_file = open( 'config.json' )
+    logging.debug("Loading config.json")
+    app_config = json.load( app_config_file )
     logging.debug("app_config loaded")
-    return appconfig
+    return app_config
 
 def get_secrets_json():
     logging.debug("Opening secrets.json")
-    secrets_file = open( 'secrets.json' )
+    app_secrets_file = open( 'secrets.json' )
     logging.debug("Loading secrets.json")
-    appsecrets = json.load( secrets_file )
+    app_secrets = json.load( app_secrets_file )
     logging.debug("secrets loaded")
-    return appsecrets
+    return app_secrets
 
 def setup_jinja2_env():
     logging.debug("In setup_jinja2_env()")
@@ -38,8 +38,9 @@ def setup_jinja2_env():
 # Variables dependent on Application basic functions
 ################################################################################
 
-appconfig = get_config_json()
-appsecrets = get_secrets_json()
+
+app_config = get_config_json()
+app_secrets = get_secrets_json()
 jinja2_env = setup_jinja2_env()
 app = Flask("vcis", static_url_path='/', static_folder='wwwroot',)
 

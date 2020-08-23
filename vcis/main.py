@@ -7,10 +7,13 @@ import json
 import logging
 from datetime import datetime
 
-# from bottle import run
-# from app.helpers import application
-# from app.settings import hostname, appconfig
-from helpers.app_runtime import app, appconfig, appsecrets
+from helpers.app_runtime import app, app_config, app_secrets
+
+from modules import *
+from api import *
+from pages import *
+from os import environ
+
 
 ################################################################################
 # Setup logging configuration
@@ -39,9 +42,9 @@ from modules import *
 ################################################################################
 
 def print_test_log():
-    if 'application' in appconfig \
-        and 'print_test_log' in appconfig['application'] \
-        and appconfig['application']['print_test_log'] == True:
+    if 'application' in app_config \
+        and 'print_test_log' in app_config['application'] \
+        and app_config['application']['print_test_log'] == True:
             logging.critical("%8s test message %s" % ("CRITICAL", str(datetime.utcnow())))
             logging.error("%8s test message %s" % ("ERROR", str(datetime.utcnow())))
             logging.warning("%8s test message %s" % ("WARNING", str(datetime.utcnow())))

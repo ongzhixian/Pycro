@@ -6,7 +6,7 @@ import logging
 import sys
 
 from flask import url_for, get_flashed_messages
-from helpers.app_runtime import jinja2_env, app_settings
+from helpers.app_runtime import jinja2_env, app_config
 
 ################################################################################
 # Functions
@@ -22,7 +22,7 @@ def get_model(cookie_json=None):
     context = cookie_json if cookie_json is not None else {}
     context['url_for'] = url_for                            # function for Flask
     context['get_flashed_messages'] = get_flashed_messages  # function for Flask
-    context['app_settings'] = app_settings                  # make application settings available
+    context['app_settings'] = app_config                  # make application settings available
     context['view_name'] = caller_name
     context['view_module'] = module_name
     context['view_package'] = package_name
