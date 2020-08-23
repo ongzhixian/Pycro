@@ -127,3 +127,17 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# ZX custom
+**/__pycache__
+
+# Production data folders
+run/*
+
+
+# Ignore production data
+cryptography-keys.json
+secrets.json
+
+_backup/
+.DS_Store
