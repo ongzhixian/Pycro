@@ -10,7 +10,7 @@ from datetime import datetime
 # from bottle import run
 # from app.helpers import application
 # from app.settings import hostname, appconfig
-from app.settings import appsecrets, appconfig
+from helpers.app_runtime import app, appconfig, appsecrets
 
 ################################################################################
 # Setup logging configuration
@@ -57,5 +57,5 @@ def print_test_log():
 if __name__ == '__main__':
     logging.info("[PROGRAM START]")
     print_test_log()
-    #app.run(host='127.0.0.1', port=8080, debug=True)
+    app.run(host='127.0.0.1', port=8080, debug=True)
     logging.info("[PROGRAM END]")
