@@ -23,7 +23,7 @@ root_logger.setLevel(logging.DEBUG)
 default_console_logger = root_logger.handlers[0]
 default_console_logger.setFormatter(logging_format)
 
-file_logger = logging.FileHandler('vcis.log')
+file_logger = logging.FileHandler('logs/vcis.log')
 file_logger.setFormatter(logging_format)
 root_logger.addHandler(file_logger)
 
@@ -57,5 +57,6 @@ def print_test_log():
 if __name__ == '__main__':
     logging.info("[PROGRAM START]")
     print_test_log()
+    # TODO: Make the host, port and debug from the below to be configurable
     app.run(host='127.0.0.1', port=8080, debug=True)
     logging.info("[PROGRAM END]")
