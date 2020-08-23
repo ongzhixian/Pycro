@@ -4,7 +4,8 @@
         "description"       : "Verified Credentials Identity Service",
         "version"           : "0.1",
         "version_date"      : "2020-08-23",
-        "email_sender"      : "no-reply@vcis.plato.emptool.com"
+        "email_sender"      : "no-reply@vcis.plato.emptool.com",
+        "print_test_log"    : false
     },
     "url_dump": {
         "sqlite3_filename"  : "./run/sqlite3/url_kb.sqlite3"
