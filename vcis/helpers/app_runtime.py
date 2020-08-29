@@ -5,6 +5,7 @@
 import logging
 import json
 
+from socket import gethostname
 from flask import Flask
 
 from jinja2 import Template, Environment, FileSystemLoader
@@ -13,12 +14,16 @@ from jinja2 import Template, Environment, FileSystemLoader
 # Define core functions
 ########################################
 
+def get_host_name():
+    return gethostname()
+
 def get_config_json():
     logging.debug("Opening config.json")
     app_config_file = open( 'config.json' )
     logging.debug("Loading config.json")
     app_config = json.load( app_config_file )
     logging.debug("app_config loaded")
+    app_config['DEVICE_NAME'] = get_host_name()
     return app_config
 
 def get_secrets_json():
