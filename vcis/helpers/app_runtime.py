@@ -47,6 +47,7 @@ def setup_jinja2_env():
 app_config = get_config_json()
 app_secrets = get_secrets_json()
 jinja2_env = setup_jinja2_env()
+api_stats = {}
 app = Flask("vcis", static_url_path='/', static_folder='wwwroot',)
 
 ################################################################################

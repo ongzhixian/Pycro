@@ -99,6 +99,22 @@ class api_common_tests(unittest.TestCase):
         self.assertEqual(jsonData['name'], '/api/common/version')
         self.assertEqual(jsonData['result'], 'success')
 
+    def test_post_api_common_echo(self):
+        """
+        python -m unittest tests.test_api_common.api_common_tests.test_post_api_common_echo
+        """
+        # Arrange
+        url = "http://127.0.0.1:8080/api/common/echo"
+        req = requests.post(url = url)
+
+        # Act
+        jsonData = req.json()
+        
+        # Assert
+        # res = isinstance(test_string, str) 
+        self.assertEqual(jsonData['name'], '/api/common/version')
+        self.assertEqual(jsonData['result'], 'success')
+
 
 if __name__ == '__main__':
     unittest.main()
