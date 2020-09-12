@@ -2,10 +2,11 @@
 # Modules and functions import statements
 ################################################################################
 
+import json
 import logging
 import sys
 
-from flask import url_for, get_flashed_messages
+from flask import url_for, get_flashed_messages, make_response
 from helpers.app_runtime import jinja2_env, app_config
 
 ################################################################################
@@ -54,7 +55,26 @@ def view(model=None, view_path=None):
     if model is None:
         model = get_model()
 
-    return jinja2_env.get_template(view_path).render(model)
+    #Return an string of rendered template
+    #return jinja2_env.get_template(view_path).render(model)
+
+    #Change to return a response object instead
+    response = make_response(jinja2_env.get_template(view_path).render(model))
+    response.headers['Server'] = app_config['application']['version']
+    return response
+
+
+def api_response(json_data):
+    response = make_response(json.dumps(json_data))
+    response.headers['Server'] = app_config['application']['version']
+    return response
+    
+
+################################################################################
+# Decorators
+################################################################################
+
+
 
 ################################################################################
 # Export module variables

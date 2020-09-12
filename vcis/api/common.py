@@ -2,12 +2,13 @@
 # Modules and functions import statements
 ################################################################################
 
-import json
 import logging
 from datetime import datetime
 from helpers.app_runtime import app, app_config
+from helpers.app_helper import api_response, get_model
 from modules.api_stats import update_api_stats, get_api_stats
 from flask import request, make_response
+
 
 ################################################################################
 # API 
@@ -44,7 +45,8 @@ def api_common_name_get(errorMessages=None):
     }
 
     update_api_stats('/api/common/name')
-    return json.dumps(json_data)
+    return api_response(json_data)
+    #return json.dumps(json_data)
 
 
 @app.route('/api/common/version', methods=['GET', 'POST'])
