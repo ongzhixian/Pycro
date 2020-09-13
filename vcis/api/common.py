@@ -5,7 +5,7 @@
 import logging
 from datetime import datetime
 from helpers.app_runtime import app, app_config
-from helpers.app_helper import api_response, get_model
+from helpers.app_helper import api_response, get_model, api_authorization
 from modules.api_stats import update_api_stats, get_api_stats
 from flask import request, make_response
 
@@ -32,6 +32,7 @@ def api_common_utc_get(errorMessages=None):
 
 
 @app.route('/api/common/name', methods=['GET', 'POST'])
+@api_authorization
 def api_common_name_get(errorMessages=None):
     '''  
     API to return device name

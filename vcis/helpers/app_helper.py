@@ -6,7 +6,7 @@ import json
 import logging
 import sys
 
-from flask import url_for, get_flashed_messages, make_response
+from flask import url_for, get_flashed_messages, make_response, request
 from helpers.app_runtime import jinja2_env, app_config
 
 ################################################################################
@@ -65,6 +65,7 @@ def view(model=None, view_path=None):
 
 
 def api_response(json_data):
+    logging.debug("IN api_response")
     response = make_response(json.dumps(json_data))
     response.headers['Server'] = app_config['application']['version']
     return response
@@ -75,6 +76,44 @@ def api_response(json_data):
 ################################################################################
 
 
+def api_authorization(fn):
+    def wrapper(*args, **kwargs):
+        logging.info("api_authorization=[{0}.{1}]".format(fn.__module__, fn.__name__))
+        # Check for cookie
+        # id_token = request.cookies.get("id_token")
+        # if not id_token:
+        #     return "invalid - api auth Failed "
+            
+        # Check for header
+        if 'id-token' not in request.headers:
+            return "invalid - api auth Failed "    
+
+        return fn(*args, **kwargs)
+    # Renaming the function name
+    # Otherwise it gives a very odd error as follows:
+    # AssertionError: View function mapping is overwriting an existing endpoint function: wrapper
+    # wrapper.__name__ = fn.__name__
+    return wrapper
+
+
+def jwt_authorization(fn):
+    def wrapper(*args, **kwargs):
+        logging.info("jwt_authorization=[{0}.{1}]".format(fn.__module__, fn.__name__))
+        # Check for cookie
+        # id_token = request.cookies.get("id_token")
+        # if not id_token:
+        #     return "invalid - api auth Failed "
+            
+        # Check for header
+        if 'id-token' not in request.headers:
+            return "invalid - api auth Failed "    
+
+        return fn(*args, **kwargs)
+    # Renaming the function name
+    # Otherwise it gives a very odd error as follows:
+    # AssertionError: View function mapping is overwriting an existing endpoint function: wrapper
+    # wrapper.__name__ = fn.__name__
+    return wrapper
 
 ################################################################################
 # Export module variables

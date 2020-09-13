@@ -55,11 +55,24 @@ def print_test_log():
 ################################################################################
 # Main function
 ################################################################################
-
+import os
 
 if __name__ == '__main__':
     logging.info("[PROGRAM START]")
     print_test_log()
     # TODO: Make the host, port and debug from the below to be configurable
-    app.run(host='127.0.0.1', port=8080, debug=True)
+    # Use SSL if conditions are right
+    if 'use_ssl' in app_config['runtime']               \
+        and app_config['runtime']['use_ssl'] == True    \
+        and 'ssl' in app_config                             \
+        and 'crt_file' in app_config['ssl']                 \
+        and app_config['ssl']['crt_file'] != None           \
+        and os.path.exists(app_config['ssl']['crt_file'])   \
+        and 'pvk_file' in app_config['ssl']                 \
+        and app_config['ssl']['pvk_file'] != None           \
+        and os.path.exists(app_config['ssl']['pvk_file']):
+        crt_file = app_config['ssl']['crt_file']
+        pvk_file = app_config['ssl']['pvk_file']
+        app.run(host='127.0.0.1', port=8080, debug=True, ssl_context=(crt_file, pvk_file))
+    app.run(host='127.0.0.1', port=8080, debug=True, ssl_context=None)
     logging.info("[PROGRAM END]")

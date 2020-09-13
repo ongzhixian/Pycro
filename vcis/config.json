@@ -7,6 +7,17 @@
         "email_sender"      : "no-reply@vcis.plato.emptool.com",
         "print_test_log"    : false
     },
+    "runtime": {
+        "host"              : "127.0.0.1",
+        "port"              : 8080,
+        "debug"             : true,
+        "use_ssl"           : true
+    },
+    "ssl": {
+        "crt_file" : "./localhost.crt",
+        "pvk_file" : "./localhost.key"
+
+    },
     "url_dump": {
         "sqlite3_filename"  : "./run/sqlite3/url_kb.sqlite3"
     },
