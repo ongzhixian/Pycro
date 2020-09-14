@@ -131,6 +131,10 @@ dmypy.json
 # ZX custom
 **/__pycache__
 ako.py
+ako.ps1
+*.crt
+*.key
+*.pvk
 
 # Production data folders
 run/*
