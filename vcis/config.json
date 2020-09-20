@@ -14,8 +14,8 @@
         "use_ssl"           : true
     },
     "ssl": {
-        "crt_file" : "./localhost.crt",
-        "pvk_file" : "./localhost.key"
+        "crt_file" : "./data/certs/localhost.crt",
+        "pvk_file" : "./data/certs/localhost.key"
 
     },
     "url_dump": {
