@@ -11,7 +11,7 @@
         "host"              : "127.0.0.1",
         "port"              : 8080,
         "debug"             : true,
-        "use_ssl"           : true
+        "use_ssl"           : false
     },
     "ssl": {
         "crt_file" : "./data/certs/localhost.crt",
@@ -29,8 +29,15 @@
         "zoga330" : {
             "src_dir"   : "C:/src/github.com/ongzhixian/Pycro/code/vcis",
             "temp_dir"  : "C:/src/temp"
+        },
+        "SG00-L4579" : {
+            "src_dir"   : "C:/src/zong/pycro/vcis",
+            "temp_dir"  : "C:/src/temp"
         }
-
+    },
+    "credential_store" : {
+        "data_store_type" : "sqlite3/mongodb/mssql/mysql/file",
+        "store_path" : "./data/sqlite3/credential_store.sqlite3"
     }
 
 }
