@@ -138,6 +138,7 @@ ako.ps1
 
 # Production data folders
 run/*
+**/data/*
 
 
 # Ignore production data
