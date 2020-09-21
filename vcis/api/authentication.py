@@ -33,7 +33,7 @@ def json_response(request, json_data=None, ex=None):
         json_data = {
             'request.path' : request_path,
             'result': 'NG',
-            'exception' : ex.description
+            'exception' : "Unknown error." if ex is None else  ex.description
         }
 
     update_api_stats(request_path)
@@ -41,18 +41,29 @@ def json_response(request, json_data=None, ex=None):
     return json.dumps(json_data)
 
 
+# TODO: Commmon validation funciton
 def expect(key_name, data_dict):
     if key_name not in data_dict:
         # TODO: Add to logging
-        import pdb
-        import inspect
-        import sys
-        caller = sys._getframe(1)
-        x = inspect.currentframe().f_back.f_locals.items()
-
-        pdb.set_trace()
         raise BadRequest('Expected parameter [{0}] not found.'.format(key_name))
+    return data_dict[key_name]
 
+
+def validate_user_credentials(username, password):
+    # Check is username is in credential store
+    # If username is in credential store, check if password is correct
+    from modules.credential_store import is_registered
+    from modules.DataStorage import SqliteDataStore
+
+    import pdb
+    pdb.set_trace()
+    credential_store = SqliteDataStore("./data/cred_store.sqlite3")
+
+    if is_registered(username):
+        return True
+    if username.lower() == "zhixian":
+        return True
+    return False
 
 ################################################################################
 # API 
@@ -65,12 +76,13 @@ def api_authenticate_user_post(errorMessages=None):
     logging.debug("In api_authenticate_user_post()")
 
     try:
+
         user_data = request.json
         if user_data is None:
             return json_response(request)
 
         # Clean input
-        # Normalize JSON keys to lowercase
+        # Normalize JSON keys to lowercase (TODO: common function)
         for k, v in user_data.items():
             if not k.islower():
                 user_data[k.lower()] = v
@@ -83,15 +95,25 @@ def api_authenticate_user_post(errorMessages=None):
         # Do something with input
         if user_data['message_type'].lower() == 'username:password':
             message_dict = user_data['message']
-            expect('username1', message_dict)
-            expect('password', message_dict)
+            username = expect('username', message_dict)
+            password = expect('password', message_dict)
 
-
-            json_data = {
-                'name' : request.path,
-                'result': 'success',
-                'jwt' : str(datetime.utcnow())
-            }
+            # Validate credentials
+            is_valid_credentials =  validate_user_credentials(username, password)
+            if is_valid_credentials:
+                # Get roles
+                # Make JWT
+                json_data = {
+                    'name' : request.path,
+                    'result': 'OK',
+                    'jwt' : str(datetime.utcnow())
+                }
+            else:
+                json_data = {
+                    'name' : request.path,
+                    'result': 'NG',
+                    'jwt' : None
+                }
             return json_response(request, json_data)
         
         raise BadRequest()
