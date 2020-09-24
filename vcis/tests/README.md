@@ -91,3 +91,14 @@ Runs all *.Tests.ps1 scripts in the current directory, and generates a coverage 
 This command runs *.Tests.ps1 files in C:\Tests and its subdirectories. In those files, it runs only tests that have UnitTest or Newest tags, unless the test also has a Bug tag.
 
 Invoke-Pester -Script C:\Tests -Tag UnitTest, Newest -ExcludeTag Bug
+
+
+## Coverage
+
+`coverage run --omit */site-packages/* main.py`
+ 
+ Run this to check how much code was called.
+
+`coverage run main.py`
+
+`coverage report`
