@@ -19,19 +19,19 @@ def get_host_name():
 
 def get_config_json():
     logging.debug("Opening config.json")
-    app_config_file = open( 'config.json' )
-    logging.debug("Loading config.json")
-    app_config = json.load( app_config_file )
-    logging.debug("app_config loaded")
+    with open( 'config.json', encoding='utf-8', mode='r') as app_config_file:
+        logging.debug("Loading config.json")
+        app_config = json.load( app_config_file )
+        logging.debug("app_config loaded")
     app_config['DEVICE_NAME'] = get_host_name()
     return app_config
 
 def get_secrets_json():
     logging.debug("Opening secrets.json")
-    app_secrets_file = open( 'secrets.json' )
-    logging.debug("Loading secrets.json")
-    app_secrets = json.load( app_secrets_file )
-    logging.debug("secrets loaded")
+    with open( 'secrets.json', encoding='utf-8', mode='r') as app_secrets_file:
+        logging.debug("Loading secrets.json")
+        app_secrets = json.load( app_secrets_file )
+        logging.debug("secrets loaded")
     return app_secrets
 
 def setup_jinja2_env():
