@@ -98,7 +98,27 @@ Invoke-Pester -Script C:\Tests -Tag UnitTest, Newest -ExcludeTag Bug
 `coverage run --omit */site-packages/* main.py`
  
  Run this to check how much code was called.
+`coverage run --omit */site-packages/* -m unittest discover -v`
 
 `coverage run main.py`
 
-`coverage report`
+`coverage report -m`
+
+tldr;
+
+```Batch script to discover tests and print coverage
+@ECHO OFF
+
+:RUN_TESTS
+ECHO Running tests
+coverage run --omit */site-packages/* -m unittest discover -v
+IF ERRORLEVEL 1 GOTO END
+
+:PRINT_COVERAGE
+coverage report -m
+
+:END
+```
+
+The idea is to run the batch script and then compare it to output of `dir *.py /s/b`.
+Then you will what files are missing from test coverage.
