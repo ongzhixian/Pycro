@@ -8,6 +8,9 @@ from helpers.app_runtime import api_stats
 #
 ################################################################################
 
+def have_api_stats(name):
+    return name in api_stats.keys()
+
 def get_api_stats(name):
     if name not in api_stats.keys():
         api_stats[name] = 0
