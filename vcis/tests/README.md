@@ -122,3 +122,9 @@ coverage report -m
 
 The idea is to run the batch script and then compare it to output of `dir *.py /s/b`.
 Then you will what files are missing from test coverage.
+
+```PowerShell script to discover tests and print coverage
+Write-Host "Running tests"
+& coverage run --omit */site-packages/* -m unittest discover -v
+if ($?) { & coverage report -m }
+```
