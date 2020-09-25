@@ -15,16 +15,6 @@ from jinja2 import Template, Environment, FileSystemLoader
 # Define core functions
 ########################################
 
-def path_exists(filepath):
-    if path.exists(filepath):
-        return True
-    else:
-        return False
-
-def open_file(filepath):
-    with open(filepath) as f:
-        return f.read()
-
 def get_host_name():
     return gethostname()
 
