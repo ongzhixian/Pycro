@@ -1,13 +1,27 @@
 import unittest
-import socket
-import os
-from unittest.mock import patch
-
+from unittest.mock import patch, mock_open
 
 class app_runtime_tests(unittest.TestCase):
     """
     python -m unittest -v tests.test_app_runtime.app_runtime_tests
     """
+
+    
+    def test_open_file(self):
+        """
+        python -m unittest -v tests.test_app_runtime.app_runtime_tests.test_open_file
+        """
+        # Arrange
+        from helpers.app_runtime import open_file
+
+        # Act
+        with patch("builtins.open", mock_open(read_data="data")) as mock_file:
+            hostname = open_file("path/to/open")
+            #assert open("path/to/open").read() == "data"
+            #mock_file.assert_called_with("path/to/open")
+            
+        # Assert
+        self.assertEqual(hostname, 'data')
     
     def test_get_host_name(self):
         """
