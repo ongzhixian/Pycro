@@ -135,6 +135,7 @@ ako.ps1
 *.crt
 *.key
 *.pvk
+**/tests/xxx*.py
 
 # Production data folders
 run/*
