@@ -15,20 +15,50 @@ from pages import *
 from os import environ
 
 
+
 ################################################################################
 # Setup logging configuration
 ################################################################################
+# import sys
+# import os
+# if sys.platform.lower() == "win32": 
+#     os.system('color')
 
+# TODO: Move this elsewhere (runtime?)
+# from flask import g
 # ZX standard for logging in Python 3
-logging_format = logging.Formatter('%(asctime)-15s %(levelname)-8s %(name)-5s %(message)s')
+class CorrelationIdFilter(logging.Filter):
+
+    # This is a logging filter that makes the request ID available for use in
+    # the logging format. Note that we're checking if we're in a request
+    # context, as we may want to log things before Flask is fully loaded.
+    def filter(self, record):
+        #record.request_id = request_id() if flask.has_request_context() else ''
+        record.request_id = 'some.g.correlationId'
+        return True
+    # def filter(self, rec):
+    #     return rec.levelno == logging.INFO
+
+# TODO: Move this elsewhere (runtime?)
+# TODO: Consider using dictconfig() format instead
+#logging_format = logging.Formatter('%(asctime)-15s %(levelname)-8s %(name)-5s %(module)s.%(funcName)s %(message)s')
+logging_format = logging.Formatter('%(asctime)-15s %(levelname)-8s %(name)-5s [%(module)s.%(funcName)s -- %(lineno)d] %(message)s (correlation_id=%(request_id)s)')
+
+correlationIDFilter = CorrelationIdFilter()
 root_logger = logging.getLogger()
 root_logger.setLevel(logging.DEBUG)
+root_logger.addFilter(correlationIDFilter)
+
 default_console_logger = root_logger.handlers[0]
 default_console_logger.setFormatter(logging_format)
+default_console_logger.addFilter(correlationIDFilter)
 
 file_logger = logging.FileHandler('logs/vcis.log')
 file_logger.setFormatter(logging_format)
+file_logger.addFilter(correlationIDFilter)
+
 root_logger.addHandler(file_logger)
+
 
 ################################################################################
 # Import api/modules
@@ -41,6 +71,7 @@ from modules import *
 # Some ad-hoc helper function
 ################################################################################
 
+# TODO: Move this elsewhere (runtime?)
 def print_test_log():
     if 'application' in app_config \
         and 'print_test_log' in app_config['application'] \
@@ -60,6 +91,7 @@ import os
 if __name__ == '__main__':
     logging.info("[PROGRAM START]")
     print_test_log()
+    # TODO: Move this elsewhere (runtime?)
     # TODO: Make the host, port and debug from the below to be configurable
     # Use SSL if conditions are right
     if 'use_ssl' in app_config['runtime']               \
