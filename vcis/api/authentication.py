@@ -12,6 +12,8 @@ from flask import request, make_response
 
 from werkzeug.exceptions import BadRequest
 
+log = logging.getLogger(__name__)
+
 ################################################################################
 # Helper response functions 
 ################################################################################
@@ -29,11 +31,13 @@ def negative_json_response(method_name):
 def json_response(request, json_data=None, ex=None):
     request_path = request.path
 
+    # import pdb
+    # pdb.set_trace()
     if json_data is None:
         json_data = {
             'request.path' : request_path,
             'result': 'NG',
-            'exception' : "Unknown error." if ex is None else  ex.description
+            'exception' : "Unknown error." if ex is None else ex.description
         }
 
     update_api_stats(request_path)
@@ -48,22 +52,65 @@ def expect(key_name, data_dict):
         raise BadRequest('Expected parameter [{0}] not found.'.format(key_name))
     return data_dict[key_name]
 
+def get_sha256_salt_and_hash(password):
+    from Crypto.Random import get_random_bytes
+    from binascii import hexlify as hex, unhexlify as unhex
+    from Crypto.Hash import SHA256
+
+    new_salt = hex(get_random_bytes(8)).decode("utf8")
+
+    h = SHA256.new()
+    h.update('soma)password'.encode('utf8'))
+
+    new_hash = new_salt + h.hexdigest()
+    return (new_salt, new_hash)
 
 def validate_user_credentials(username, password):
     # Check is username is in credential store
     # If username is in credential store, check if password is correct
     from modules.credential_store import is_registered
-    from modules.DataStorage import SqliteDataStore
+    from modules.DataStorage import DataStore, SqliteDataStore, UserModel
+    
+    (pwd_salt, pwd_hash) = get_sha256_salt_and_hash(password)    
 
-    import pdb
-    pdb.set_trace()
-    credential_store = SqliteDataStore("./data/cred_store.sqlite3")
+    data_store = DataStore('sqlite')
 
-    if is_registered(username):
+    # data_store.add_user('asd2', pwd_hash, pwd_salt, 'asd@localhost')
+
+    user = data_store.get_user(username)
+    if user is not None and user.is_valid_credential(password):
         return True
-    if username.lower() == "zhixian":
-        return True
+
     return False
+    
+    #h.update(password.encode("utf8"))
+    
+    # pwd_salt = hex(get_random_bytes(8))
+    # pwd_hash = pwd_salt + h.hexdigest()
+
+    # credential_store = SqliteDataStore("./data/cred_store.sqlite3")
+    # results = credential_store.query('SELECT * FROM user WHERE username=?', username)
+
+    # if len(results) <= 0:
+    #     logging.info("Username (%s) not found.", username)
+    #     return False
+    
+    # logging.info("Username (%s) found. %s", username, results[0])
+    # # logging.info(results[0])
+    # userData = UserModel(results[0])
+    # if userData.IsValidCredential(password):
+    #     return True
+
+    #args = ('zhixian',)
+    #q = credential_store.query('SELECT * FROM user')
+    # import pdb
+    # pdb.set_trace()
+
+    # if is_registered(username):
+    #     return True
+    # if username.lower() == "zhixian":
+    #     return True
+    
 
 ################################################################################
 # API 
@@ -76,9 +123,11 @@ def api_authenticate_user_post(errorMessages=None):
     logging.debug("In api_authenticate_user_post()")
 
     try:
+        log.warning('SPECIAL log')
 
         user_data = request.json
         if user_data is None:
+            logging.debug("user_data is None")
             return json_response(request)
 
         # Clean input
