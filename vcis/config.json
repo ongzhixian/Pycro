@@ -18,6 +18,9 @@
         "pvk_file" : "./data/certs/localhost.key"
 
     },
+    "jwk": {
+        "expiry" : 20
+    },
     "url_dump": {
         "sqlite3_filename"  : "./run/sqlite3/url_kb.sqlite3"
     },
