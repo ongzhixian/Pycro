@@ -5,7 +5,7 @@
 import json
 import logging
 from datetime import datetime
-from helpers.app_runtime import app, app_config
+from helpers.app_runtime import app, app_config, app_secrets
 from helpers.app_helper import api_response, get_model, api_authorization
 from modules.api_stats import update_api_stats, get_api_stats
 from flask import request, make_response
@@ -82,7 +82,7 @@ def validate_user_credentials(username, password):
         return True
 
     return False
-    
+
     #h.update(password.encode("utf8"))
     
     # pwd_salt = hex(get_random_bytes(8))
@@ -111,6 +111,61 @@ def validate_user_credentials(username, password):
     # if username.lower() == "zhixian":
     #     return True
     
+def createJwt():
+    
+    import json
+    from jwcrypto.jwk import JWK
+    from jwcrypto.jwt import JWT
+    from time import time
+
+    
+    jwk = None
+
+    # Get JWK (if exists)
+    if 'jwk' in app_secrets and 'kty' in app_secrets['jwk']:
+        key_type = app_secrets['jwk']['kty'].lower()
+        if key_type == "oct" and 'k' in app_secrets['jwk']:
+            jwk = { 
+                'kty' : key_type, 
+                'k': app_secrets['jwk']['k'] 
+            }
+        # Add support for other key types here;
+        # For now, we only support octat sequence ("oct")
+
+    if jwk is not None:
+        key = JWK.from_json(json.dumps(jwk))
+        nbf = round(time())
+        exp = nbf + (60 * 20) # 20 minutes
+
+    token = JWT(
+        header = {
+            "alg": "HS256"
+        },
+        claims = {
+            "iss" : "plato.emptool.com",
+            "aud" : "plato.emptool.com",
+            "nbf" : nbf,
+            "exp" : exp,
+            "info": "I'm a signed token"
+        })
+    token.make_signed_token(key)
+    logging.info(token.serialize())
+
+    encrypted_token = JWT(
+        header = {
+            "alg": "A256KW", 
+            "enc": "A256CBC-HS512"
+        },
+        claims = token.serialize()
+        )
+    encrypted_token.make_encrypted_token(key)
+    encrypted_token.serialize()
+
+    
+
+    import pdb
+    pdb.set_trace()
+    pass
 
 ################################################################################
 # API 
@@ -124,6 +179,8 @@ def api_authenticate_user_post(errorMessages=None):
 
     try:
         log.warning('SPECIAL log')
+
+        createJwt()
 
         user_data = request.json
         if user_data is None:
