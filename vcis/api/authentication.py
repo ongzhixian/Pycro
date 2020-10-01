@@ -7,6 +7,7 @@ import logging
 from datetime import datetime
 from helpers.app_runtime import app, app_config, app_secrets
 from helpers.app_helper import api_response, get_model, api_authorization
+from helpers.jwt_helper import create_claims, create_signed_jwt, create_encrypted_jwt
 from modules.api_stats import update_api_stats, get_api_stats
 from flask import request, make_response
 
@@ -31,8 +32,6 @@ def negative_json_response(method_name):
 def json_response(request, json_data=None, ex=None):
     request_path = request.path
 
-    # import pdb
-    # pdb.set_trace()
     if json_data is None:
         json_data = {
             'request.path' : request_path,
@@ -75,6 +74,7 @@ def validate_user_credentials(username, password):
 
     data_store = DataStore('sqlite')
 
+    # TODO: Add a add_user api
     # data_store.add_user('asd2', pwd_hash, pwd_salt, 'asd@localhost')
 
     user = data_store.get_user(username)
@@ -111,62 +111,6 @@ def validate_user_credentials(username, password):
     # if username.lower() == "zhixian":
     #     return True
     
-def createJwt():
-    
-    import json
-    from jwcrypto.jwk import JWK
-    from jwcrypto.jwt import JWT
-    from time import time
-
-    
-    jwk = None
-
-    # Get JWK (if exists)
-    if 'jwk' in app_secrets and 'kty' in app_secrets['jwk']:
-        key_type = app_secrets['jwk']['kty'].lower()
-        if key_type == "oct" and 'k' in app_secrets['jwk']:
-            jwk = { 
-                'kty' : key_type, 
-                'k': app_secrets['jwk']['k'] 
-            }
-        # Add support for other key types here;
-        # For now, we only support octat sequence ("oct")
-
-    if jwk is not None:
-        key = JWK.from_json(json.dumps(jwk))
-        nbf = round(time())
-        exp = nbf + (60 * 20) # 20 minutes
-
-    token = JWT(
-        header = {
-            "alg": "HS256"
-        },
-        claims = {
-            "iss" : "plato.emptool.com",
-            "aud" : "plato.emptool.com",
-            "nbf" : nbf,
-            "exp" : exp,
-            "info": "I'm a signed token"
-        })
-    token.make_signed_token(key)
-    logging.info(token.serialize())
-
-    encrypted_token = JWT(
-        header = {
-            "alg": "A256KW", 
-            "enc": "A256CBC-HS512"
-        },
-        claims = token.serialize()
-        )
-    encrypted_token.make_encrypted_token(key)
-    encrypted_token.serialize()
-
-    
-
-    import pdb
-    pdb.set_trace()
-    pass
-
 ################################################################################
 # API 
 ################################################################################
@@ -179,8 +123,6 @@ def api_authenticate_user_post(errorMessages=None):
 
     try:
         log.warning('SPECIAL log')
-
-        createJwt()
 
         user_data = request.json
         if user_data is None:
@@ -212,7 +154,9 @@ def api_authenticate_user_post(errorMessages=None):
                 json_data = {
                     'name' : request.path,
                     'result': 'OK',
-                    'jwt' : str(datetime.utcnow())
+                    'jwt' : create_signed   _jwt(create_claims({
+                        "info": "I'm a signed token"
+                    }))
                 }
             else:
                 json_data = {

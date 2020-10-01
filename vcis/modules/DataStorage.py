@@ -35,7 +35,9 @@ class UserModel(DataModel):
         h = SHA256.new()
         h.update(password.encode('utf8'))
         compute_hash = self.password_salt + h.hexdigest()
-        
+
+        logging.debug("compute_hash is [{0}]".format(compute_hash))
+
         return self.password_hash == compute_hash
 
 class DataStore:

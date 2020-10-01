@@ -8,6 +8,7 @@ import sys
 
 from flask import url_for, get_flashed_messages, make_response, request
 from helpers.app_runtime import jinja2_env, app_config
+from helpers.jwt_helper import decrypt_jwt
 
 ################################################################################
 # Functions
@@ -83,10 +84,24 @@ def api_authorization(fn):
         # id_token = request.cookies.get("id_token")
         # if not id_token:
         #     return "invalid - api auth Failed "
-            
+        
+        
         # Check for header
-        if 'id-token' not in request.headers:
-            return "invalid - api auth Failed "    
+        if "authorization" not in request.headers:
+            return "invalid - api auth Failed "
+
+        auth_tokens = request.headers["Authorization"].split()
+        if len(auth_tokens) < 2:
+            return "invalid len - api auth Failed "
+        
+        jwt = auth_tokens[1]
+
+        r = decrypt_jwt(jwt)
+        
+        import pdb
+        pdb.set_trace()
+        # if 'id-token' not in request.headers:
+        #     return "invalid - api auth Failed "
 
         return fn(*args, **kwargs)
     # Renaming the function name

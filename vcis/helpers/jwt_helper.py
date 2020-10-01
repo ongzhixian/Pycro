@@ -24,61 +24,100 @@ def get_jwk():
         return JWK.from_json(json.dumps(jwk_config))
     return None
 
-def create_signed_jwt():
-    jwk = get_jwk()
-
-    if jwk is None:
-        return None
-
-    nbf = round(time())
-    exp = nbf + (60 * 20) # 20 minutes TODO: read from config
-
-    token = JWT(
-        header = {
-            "alg": "HS256"
-        },
-        claims = {
-            "iss" : "plato.emptool.com",
-            "aud" : "plato.emptool.com",
-            "nbf" : nbf,
-            "exp" : exp,
-            "info": "I'm a signed token"
-        })
-    token.make_signed_token(jwk)
-    return token
+def create_claims(claims=None):
     
-    #logging.info(token.serialize())
+    if claims == None:
+        claims = {}
 
-
-def create_encrypted_jwt():
-    jwk = get_jwk()
-
-    if jwk is None:
-        return None
+    for k, v in claims.items():
+        if not k.islower():
+            claims[k.lower()] = v
+            claims.pop(k)
 
     nbf = round(time())
     exp = nbf + (60 * 20) # 20 minutes TODO: read from config
 
+    if 'iss' not in claims.keys():
+        claims["iss"] = "plato.emptool.com"
+    if 'aud' not in claims.keys():
+        claims["aud"] = "plato.emptool.com"
+    if 'nbf' not in claims.keys():
+        claims["nbf"] = nbf
+    if 'exp' not in claims.keys():
+        claims["exp"] = exp
+
+    return claims
+
+def create_signed_token(claims, jwk = get_jwk()):
+    
+    if jwk is None:
+        return None
+    
     token = JWT(
         header = {
             "alg": "HS256"
         },
-        claims = {
-            "iss" : "plato.emptool.com",
-            "aud" : "plato.emptool.com",
-            "nbf" : nbf,
-            "exp" : exp,
-            "info": "I'm a signed token"
-        })
+        claims = claims)
+
     token.make_signed_token(jwk)
-    logging.info(token.serialize())
+
+    return token
+
+def create_signed_jwt(claims, jwk = get_jwk()):
+    
+    signed_token = create_signed_token(claims, jwk)
+
+    if signed_token is None:
+        return None
+    
+    logging.debug("signed_token (serialize) [{0}]".format(signed_token.serialize()))
+    return signed_token.serialize()
+
+
+def create_encrypted_token(claims, jwk = get_jwk()):
+
+    signed_token = create_signed_jwt(claims, jwk)
 
     encrypted_token = JWT(
         header = {
             "alg": "A256KW", 
             "enc": "A256CBC-HS512"
         },
-        claims = token.serialize()
-        )
+        claims = signed_token.serialize()
+    )
+
     encrypted_token.make_encrypted_token(jwk)
+    
+    return encrypted_token
+
+def create_encrypted_jwt(claims, jwk = get_jwk()):
+    
+    encrypted_token = create_encrypted_token(claims, jwk)
+    if encrypted_token is None:
+        return None
+    
     return encrypted_token.serialize()
+
+
+def decrypt_jwt(jwt, jwk = get_jwk()):
+
+    if jwk is None:
+        return None
+
+    encrypted_token = JWT(key=jwk, jwt=jwt)
+    
+    
+    import pdb
+    pdb.set_trace()
+
+    #signed_token = JWT(key=jwk, jwt=encrypted_token.claims)
+    signed_token = JWT(key=jwk, jwt=encrypted_token.claims)
+    
+
+    import pdb
+    pdb.set_trace()
+
+    return signed_token.claims
+    
+    # >>> ST.claims
+    # u'{"info":"I\'m a signed token"}'
