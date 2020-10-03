@@ -110,7 +110,10 @@ def decrypt_jwt(jwt, jwk = get_jwk()):
     #signed_token = JWT(key=jwk, jwt=encrypted_token.claims)
     signed_token = JWT(key=jwk, jwt=encrypted_token.claims)
 
-    return signed_token.claims
+    # import pdb
+    # pdb.set_trace()
+
+    return json.loads(signed_token.claims)
     
     # >>> ST.claims
     # u'{"info":"I\'m a signed token"}'
