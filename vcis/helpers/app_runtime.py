@@ -6,7 +6,7 @@ import logging
 import json
 
 from os import path
-from socket import gethostname
+from socket import gethostname, getfqdn
 from uuid import uuid4
 from flask import Flask, g, request
 
@@ -19,6 +19,9 @@ from jinja2 import Template, Environment, FileSystemLoader
 def get_host_name():
     return gethostname()
 
+def get_domain_name():
+    return getfqdn()
+
 def get_config_json(filename='config.json'):
     if path.exists(filename):
         logging.debug("Opening config.json")
@@ -29,6 +32,7 @@ def get_config_json(filename='config.json'):
     else:
         app_config = {}
     app_config['DEVICE_NAME'] = get_host_name()
+    app_config['DOMAIN_NAME'] = get_domain_name()
     return app_config
 
 def get_secrets_json(filename='secrets.json'):
@@ -72,19 +76,20 @@ app = Flask("vcis", static_url_path='/', static_folder='wwwroot',)
 
 @app.before_request
 def before_each_request():
-    
     # g is an object provided by Flask. 
     # It is a global namespace for holding any data you want during a single app context.
     # An app context lasts for one request / response cycle, 
     # Hence, g is not appropriate for storing data across requests
-    g.user = "alibaba"
     logging.warning("before_request is running!")
     correlation_id = request.headers.get("X-Correlation-Id")
     if correlation_id is None:
         correlation_id = uuid4()
     g.correlation_id = correlation_id
+    g.user = "alibaba"
     # ZX:   Unfortunate, we cannot make changes to request.headers 
     #       (its 'EnvironHeaders' and they are immutable)
+    # import pdb
+    # pdb.set_trace()
     
 # @app.after_request
 # def after_request_func(response):
