@@ -98,8 +98,6 @@ def api_authorization(fn):
 
         r = decrypt_jwt(jwt)
         
-        import pdb
-        pdb.set_trace()
         # if 'id-token' not in request.headers:
         #     return "invalid - api auth Failed "
 

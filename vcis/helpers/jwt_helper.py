@@ -76,14 +76,14 @@ def create_signed_jwt(claims, jwk = get_jwk()):
 
 def create_encrypted_token(claims, jwk = get_jwk()):
 
-    signed_token = create_signed_jwt(claims, jwk)
+    signed_jwt = create_signed_jwt(claims, jwk)
 
     encrypted_token = JWT(
         header = {
             "alg": "A256KW", 
             "enc": "A256CBC-HS512"
         },
-        claims = signed_token.serialize()
+        claims = signed_jwt
     )
 
     encrypted_token.make_encrypted_token(jwk)
@@ -93,6 +93,7 @@ def create_encrypted_token(claims, jwk = get_jwk()):
 def create_encrypted_jwt(claims, jwk = get_jwk()):
     
     encrypted_token = create_encrypted_token(claims, jwk)
+
     if encrypted_token is None:
         return None
     
@@ -105,17 +106,9 @@ def decrypt_jwt(jwt, jwk = get_jwk()):
         return None
 
     encrypted_token = JWT(key=jwk, jwt=jwt)
-    
-    
-    import pdb
-    pdb.set_trace()
 
     #signed_token = JWT(key=jwk, jwt=encrypted_token.claims)
     signed_token = JWT(key=jwk, jwt=encrypted_token.claims)
-    
-
-    import pdb
-    pdb.set_trace()
 
     return signed_token.claims
     

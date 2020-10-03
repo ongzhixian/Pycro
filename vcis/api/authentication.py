@@ -103,8 +103,6 @@ def validate_user_credentials(username, password):
 
     #args = ('zhixian',)
     #q = credential_store.query('SELECT * FROM user')
-    # import pdb
-    # pdb.set_trace()
 
     # if is_registered(username):
     #     return True
@@ -154,8 +152,9 @@ def api_authenticate_user_post(errorMessages=None):
                 json_data = {
                     'name' : request.path,
                     'result': 'OK',
-                    'jwt' : create_signed   _jwt(create_claims({
-                        "info": "I'm a signed token"
+                    'jwt' : create_encrypted_jwt(
+                                create_claims({
+                                    "info": "I'm a signed token"
                     }))
                 }
             else:
