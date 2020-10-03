@@ -19,7 +19,7 @@ def api_common_utc_get(errorMessages=None):
     '''  
     API to return server time in UTC
     '''
-    logging.debug("In api_common_utc_get()")
+    logging.debug("[BEGIN] api_common_utc_get()")
 
     json_data = {
         'name' : '/api/common/utc',
@@ -29,6 +29,8 @@ def api_common_utc_get(errorMessages=None):
 
     update_api_stats('/api/common/utc')
     logging.debug(get_api_stats('/api/common/utc'))
+
+    logging.debug("[END] api_common_utc_get()")
     return json.dumps(json_data)
 
 
@@ -43,8 +45,11 @@ def api_common_name_get(errorMessages=None):
     json_data = {
         'name' : '/api/common/name',
         'result': 'success',
-        'device_name' : app_config['DEVICE_NAME']
+        'device_name' : app_config['DEVICE_NAME'],
+        'domain_name' : app_config['DOMAIN_NAME']
     }
+    import pdb
+    pdb.set_trace()
 
     update_api_stats('/api/common/name')
     return api_response(json_data)

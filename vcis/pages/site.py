@@ -15,4 +15,6 @@ from helpers.app_helper import view, get_model
 def webroot_get():
     logging.info("In webroot_get()")
     view_model = get_model()
-    return view(view_model)
+    resp = view(view_model)
+    #resp.set_cookie('userID', "zhizhi")
+    return resp
