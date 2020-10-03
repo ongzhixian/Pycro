@@ -95,8 +95,21 @@ def api_authorization(fn):
             return "invalid len - api auth Failed "
         
         jwt = auth_tokens[1]
+        claims = decrypt_jwt(jwt)
+        # {'aud': 'plato.emptool.com'
+        # , 'exp': 1601691436
+        # , 'info': "I'm a signed token"
+        # , 'iss': 'plato.emptool.com'
+        # , 'nbf': 1601690236} (correlation_id=some.g.correlationId)
 
-        r = decrypt_jwt(jwt)
+        # We only accept claims intend for us (audience)
+        
+
+        # We only accept claims from issuers/audience
+
+        logging.info(claims)
+
+
         
         # if 'id-token' not in request.headers:
         #     return "invalid - api auth Failed "
