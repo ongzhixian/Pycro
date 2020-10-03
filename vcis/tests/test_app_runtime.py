@@ -46,7 +46,7 @@ class app_runtime_tests(unittest.TestCase):
         # Assert
         mock_func_path_exists.assert_called_once()
         mock_func_open.assert_not_called()
-        self.assertEqual(len(app_config), 1)
+        self.assertEqual(len(app_config), 2)
         self.assertEqual(True, 'DEVICE_NAME' in app_config.keys())
 
     def test_get_config_json_valid_json(self):
@@ -69,7 +69,7 @@ class app_runtime_tests(unittest.TestCase):
         # Assert
         mock_func_path_exists.assert_called_once()
         mock_func_open.assert_called_once()
-        self.assertEqual(len(app_config), 2)
+        self.assertEqual(len(app_config), 3)
         self.assertEqual(True, 'DEVICE_NAME' in app_config.keys())
         self.assertEqual(True, 'AUTH_MODE' in app_config.keys())
 
@@ -161,3 +161,40 @@ class app_runtime_tests(unittest.TestCase):
         mock_func_path_exists.assert_called_once()
         mock_func_open.assert_called_once()
         self.assertEqual(app_secrets, None)
+
+
+
+    def mock_api_call2(self):
+        g = lambda x : x
+        g.userxxx = 'alad'
+        # g.pp = 'asd'
+        #setattr(g, 'user', 'aaa')
+        #setattr(self, 'userAAA', 'www')
+        # import pdb
+        # pdb.set_trace()
+        return g
+
+    def test_before_each_request(self):
+        """
+        python -m unittest -v tests.test_app_runtime.app_runtime_tests.test_before_each_request
+        """
+        # Arrange
+        from helpers.app_runtime import before_each_request
+        from flask import Flask
+        from uuid import UUID
+
+        # Act
+        app = Flask(__name__)
+        with app.test_request_context('/?name=ya') as mock_context \
+        , patch("helpers.app_runtime.uuid4", return_value=UUID('139f1fb2-e510-4ad9-ad27-1e8bddbdcbbe')) as mock_uuid4 \
+        , patch("helpers.app_runtime.g") as mock_g:
+            #app.preprocess_request()
+            before_each_request()
+            print("User is [{0}], correlation id is [{1}]".format(mock_g.user, mock_g.correlation_id))
+
+        # with patch("helpers.app_runtime.g", return_value=True):
+        #     before_each_request()
+
+        # Assert
+        mock_uuid4.assert_called_once()
+        self.assertEqual(mock_g.correlation_id, UUID('139f1fb2-e510-4ad9-ad27-1e8bddbdcbbe'))
