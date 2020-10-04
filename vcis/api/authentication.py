@@ -79,9 +79,10 @@ def validate_user_credentials(username, password):
 
     user = data_store.get_user(username)
     if user is not None and user.is_valid_credential(password):
-        return True
+        return (True, user)
 
-    return False
+    return (False, None)
+
 
     #h.update(password.encode("utf8"))
     
@@ -108,6 +109,7 @@ def validate_user_credentials(username, password):
     #     return True
     # if username.lower() == "zhixian":
     #     return True
+
     
 ################################################################################
 # API 
@@ -145,7 +147,7 @@ def api_authenticate_user_post(errorMessages=None):
             password = expect('password', message_dict)
 
             # Validate credentials
-            is_valid_credentials =  validate_user_credentials(username, password)
+            (is_valid_credentials, user) =  validate_user_credentials(username, password)
             if is_valid_credentials:
                 # Get roles
                 # Make JWT
@@ -154,6 +156,7 @@ def api_authenticate_user_post(errorMessages=None):
                     'result': 'OK',
                     'jwt' : create_encrypted_jwt(
                                 create_claims({
+                                    "username": user.username,
                                     "info": "I'm a signed token"
                     }))
                 }
