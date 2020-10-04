@@ -6,13 +6,35 @@ import json
 import logging
 import sys
 
-from flask import url_for, get_flashed_messages, make_response, request
+from flask import url_for, get_flashed_messages, make_response, request, g
 from helpers.app_runtime import jinja2_env, app_config
 from helpers.jwt_helper import decrypt_jwt
 
 ################################################################################
 # Functions
 ################################################################################
+
+def get_app_config(name="", config=app_config):
+    # Let's return a empty string on not found for now.
+    # It maybe better to raise an exception
+    # TODO: Change all the app_config['application']['session_id'] to use this function instead
+    if name is None:
+        return ""
+
+    tokens = name.split(".")
+
+    if len(tokens) <= 0:
+        return "" 
+
+    token_1 = tokens[0]
+
+    if len(tokens[1:]) > 0 and token_1 in config:
+        return get_app_config(".".join(tokens[1:]), config[token_1])
+
+    if len(tokens[1:]) == 0 and token_1 in config:
+        return config[token_1]
+    else:
+        return ""
 
 def get_model(cookie_json=None):
     caller = sys._getframe(1)                       # '_getframe(1)' gets previous stack; 
@@ -62,6 +84,8 @@ def view(model=None, view_path=None):
     #Change to return a response object instead
     response = make_response(jinja2_env.get_template(view_path).render(model))
     response.headers['Server'] = app_config['application']['version']
+    #a = get_app_config("application.test_nested.test_username")
+    response.set_cookie(app_config['application']['session_id'], g.session_id)
     return response
 
 
@@ -69,6 +93,7 @@ def api_response(json_data):
     logging.debug("IN api_response")
     response = make_response(json.dumps(json_data))
     response.headers['Server'] = app_config['application']['version']
+    response.set_cookie(app_config['application']['session_id'], g.session_id)
     return response
     
 
@@ -94,27 +119,30 @@ def api_authorization(fn):
         if len(auth_tokens) < 2:
             return "invalid len - api auth Failed "
         
+        # decode JWT
         jwt = auth_tokens[1]
         claims = decrypt_jwt(jwt)
-        # {'aud': 'plato.emptool.com'
+        # {
+        #   'aud': 'plato.emptool.com'
         # , 'exp': 1601691436
         # , 'info': "I'm a signed token"
         # , 'iss': 'plato.emptool.com'
         # , 'nbf': 1601690236} (correlation_id=some.g.correlationId)
 
-        # We only accept claims intend for us (audience)
-        
+        # TODO: We only accept claims intend for us (audience)
 
-        # We only accept claims from issuers/audience
+        # TODO: We only accept claims from issuers/audience
+
+        # if claims contains username, set username
+        if 'username' in claims and len(claims['username'].strip()) > 0:
+            g.username = claims['username']
 
         logging.info(claims)
-
-
-        
         # if 'id-token' not in request.headers:
         #     return "invalid - api auth Failed "
 
         return fn(*args, **kwargs)
+
     # Renaming the function name
     # Otherwise it gives a very odd error as follows:
     # AssertionError: View function mapping is overwriting an existing endpoint function: wrapper
