@@ -5,7 +5,11 @@
         "version"           : "0.1",
         "version_date"      : "2020-08-23",
         "email_sender"      : "no-reply@vcis.plato.emptool.com",
-        "print_test_log"    : false
+        "session_id"        : "vcis_sid",
+        "print_test_log"    : false,
+        "test_nested"       : {
+            "test_username" : "dummy_tester"
+        }
     },
     "runtime": {
         "host"              : "127.0.0.1",
