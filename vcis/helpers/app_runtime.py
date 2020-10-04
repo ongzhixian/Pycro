@@ -95,11 +95,9 @@ def before_each_request():
         g.session_id = uuid4().hex
     
     # Move the code to set username in authentication
-    #g.user = "alibaba"
+    # g.user = "alibaba"
     # ZX:   Unfortunate, we cannot make changes to request.headers 
     #       (its 'EnvironHeaders' and they are immutable)
-    # import pdb
-    # pdb.set_trace()
     
 # @app.after_request
 # def after_request_func(response):

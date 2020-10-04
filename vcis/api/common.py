@@ -48,9 +48,7 @@ def api_common_name_get(errorMessages=None):
         'device_name' : app_config['DEVICE_NAME'],
         'domain_name' : app_config['DOMAIN_NAME']
     }
-    import pdb
-    pdb.set_trace()
-
+    
     update_api_stats('/api/common/name')
     return api_response(json_data)
     #return json.dumps(json_data)

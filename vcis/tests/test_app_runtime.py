@@ -170,8 +170,6 @@ class app_runtime_tests(unittest.TestCase):
         # g.pp = 'asd'
         #setattr(g, 'user', 'aaa')
         #setattr(self, 'userAAA', 'www')
-        # import pdb
-        # pdb.set_trace()
         return g
 
     def test_before_each_request(self):
