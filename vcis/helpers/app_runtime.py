@@ -85,7 +85,17 @@ def before_each_request():
     if correlation_id is None:
         correlation_id = uuid4()
     g.correlation_id = correlation_id
-    g.user = "alibaba"
+
+    # Check if have session cookie, else set a session id
+    session_id_key = app_config['application']['session_id']
+    if session_id_key in request.cookies:
+        # TODO: Apply encryption of this session_id key
+        g.session_id = request.cookies[session_id_key]
+    else:
+        g.session_id = uuid4().hex
+    
+    # Move the code to set username in authentication
+    #g.user = "alibaba"
     # ZX:   Unfortunate, we cannot make changes to request.headers 
     #       (its 'EnvironHeaders' and they are immutable)
     # import pdb
