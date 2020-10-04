@@ -14,7 +14,7 @@ def encrypt(plain_text):
     base64.b64encode(encrypted_bytes)
     # This will yield the result: b'Stg6Gw9IfPNmr+7rbYiFKQ=='
 
-def decrypt(encrypted_bytes_base64)
+def decrypt(encrypted_bytes_base64):
     # Decryption
     # This should be fired as a single block
     iv = base64.b64decode("PPPlOzBmlPUU19DuwVL1DQ==")
