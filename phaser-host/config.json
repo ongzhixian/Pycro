@@ -1,0 +1,50 @@
+{
+    "application": {
+        "application_name"  : "vcis",
+        "description"       : "Verified Credentials Identity Service",
+        "version"           : "0.1",
+        "version_date"      : "2020-08-23",
+        "email_sender"      : "no-reply@vcis.plato.emptool.com",
+        "session_id"        : "vcis_sid",
+        "print_test_log"    : false,
+        "test_nested"       : {
+            "test_username" : "dummy_tester"
+        }
+    },
+    "runtime": {
+        "host"              : "127.0.0.1",
+        "port"              : 8080,
+        "debug"             : true,
+        "use_ssl"           : false
+    },
+    "ssl": {
+        "crt_file" : "./data/certs/localhost.crt",
+        "pvk_file" : "./data/certs/localhost.key"
+
+    },
+    "jwk": {
+        "expiry" : 20
+    },
+    "url_dump": {
+        "sqlite3_filename"  : "./run/sqlite3/url_kb.sqlite3"
+    },
+    "runtime_environment"   : {
+        "acadian" : {
+            "src_dir"   : "D:/src/github.com/ongzhixian/Pycro/code/vcis",
+            "temp_dir"  : "D:/temp"
+        },
+        "zoga330" : {
+            "src_dir"   : "C:/src/github.com/ongzhixian/Pycro/code/vcis",
+            "temp_dir"  : "C:/src/temp"
+        },
+        "SG00-L4579" : {
+            "src_dir"   : "C:/src/zong/pycro/vcis",
+            "temp_dir"  : "C:/src/temp"
+        }
+    },
+    "credential_store" : {
+        "data_store_type" : "sqlite3/mongodb/mssql/mysql/file",
+        "store_path" : "./data/sqlite3/credential_store.sqlite3"
+    }
+
+}

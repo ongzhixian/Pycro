@@ -1,0 +1,12 @@
+# Requirements
+# ============
+# To install run:
+#   pip install -r requirements.txt
+# OR
+#   python3 pip install -r requirements.txt
+# python -m pip install --upgrade pip
+Flask==1.1.1
+requests==2.22.0
+pycryptodome
+jwcrypto
+# pymongo

@@ -1,0 +1,428 @@
+{% extends "_layouts/_default.html" %}
+
+{% block title %} home {% endblock %} 
+
+{% block linktags %}
+<meta name="description" content="home page" /> 
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="g-item g-content">
+        <canvas id="g-map"></canvas>
+        <div id="g-info" class="hidden">
+            g-info
+        </div>
+    </div>
+
+    <div class="g-item g-events">
+        <div>
+            <div style="float:right">
+                <span>view history</span> | <span>clear history</span>
+            </div>
+            <h1>Events</h1>
+        </div>
+        
+        <ul id="event_list">
+            <li>event 1</li>
+            <li>event 2</li>
+            <li>event 3</li>
+            <li>event 4</li>
+            <li>event 5</li>
+            <li>event 1</li>
+            <li>event 2</li>
+            <li>event 3</li>
+            <li>event 4</li>
+            <li>event 5</li>
+            <li>event 1</li>
+            <li>event 2</li>
+            <li>event 3</li>
+            <li>event 4</li>
+            <li>event 5</li>
+        </ul>
+
+    </div>
+
+    <div class="g-item g-date">
+        <p>Current date: 2020-12-31</p>
+        <p>Winter</p>
+    </div>
+
+    <div class="g-item g-menu">
+        
+        <div class="g-menu-item">menu item 1</div>
+        <div class="g-menu-item">menu item 2</div>
+        <div class="g-menu-item">menu item 3</div>
+        <div class="g-menu-item">menu item 4</div>
+        <div class="g-menu-item">menu item 5</div>
+        <div class="g-menu-item">menu item 6</div>
+        <div class="g-menu-item">menu item 7</div>
+        <div class="g-menu-item">menu item 8</div>
+        <div class="g-menu-item">menu item 9</div>
+        <div class="g-menu-item">menu item 10</div>
+
+        <div class="g-menu-item">menu item 11</div>
+        <div class="g-menu-item">menu item 12</div>
+        <div class="g-menu-item">menu item 13</div>
+        <div class="g-menu-item">menu item 14</div>
+        <div class="g-menu-item">menu item 15</div>
+        <div class="g-menu-item">menu item 16</div>
+        <div class="g-menu-item">menu item 17</div>
+        <div class="g-menu-item">menu item 18</div>
+        <div class="g-menu-item">menu item 19</div>
+        <div class="g-menu-item">menu item 20</div>
+
+        <div class="g-menu-item">menu item 21</div>
+        <div class="g-menu-item">menu item 22</div>
+        <div class="g-menu-item">menu item 23</div>
+        <div class="g-menu-item">menu item 24</div>
+        <div class="g-menu-item" title="menu item 25" data-action="menu-item-25">menu item 25</div>
+
+    </div>
+
+    <div class="g-item g-cmd">
+        <div id="prompt">
+            <span id="prompt_text">What would you like to do?</span>
+            <input class="cmd" id="input_cmd" type="text" />
+        </div>
+        <div id="cmd_feedback" class="error"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script type="text/javascript">
+// https://geeksretreat.wordpress.com/2012/04/26/html5s-canvas-lets-draw-the-world/
+// https://github.com/rheh/HTML5-canvas-projects/blob/master/map/map.js
+// https://www.redblobgames.com/x/2022-voronoi-maps-tutorial/
+
+var iCANVAS_START_X_POS = 0,
+	iCANVAS_START_Y_POS = 0,
+	iCANVAS_HEIGHT = 790,
+	iCANVAS_WIDTH = 1580,
+	iSPACE_FOR_LABEL = 00,
+	iMAP_START_X_POS = iCANVAS_START_X_POS + iSPACE_FOR_LABEL,
+	iMAP_START_Y_POS = iCANVAS_START_Y_POS + iSPACE_FOR_LABEL,
+	iMAP_HEIGHT = iCANVAS_HEIGHT - (iSPACE_FOR_LABEL * 2),
+    iMAP_WIDTH = iCANVAS_WIDTH - (iSPACE_FOR_LABEL * 2);
+    
+
+function fitToContainer(canvas){
+    // Make it visually fill the positioned parent
+    canvas.style.width ='100%';
+    canvas.style.height='100%';
+    // ...then set the internal size to match
+    canvas.width  = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    
+    iCANVAS_WIDTH = canvas.width;
+    iCANVAS_HEIGHT = canvas.height;
+}
+
+function drawBackground(ctx)
+{
+    // Black background
+    ctx.fillStyle = "rgb(0,0,0)";
+ 
+    // Draw rectangle for the background
+    ctx.fillRect(iCANVAS_START_X_POS, iCANVAS_START_Y_POS, (iCANVAS_START_X_POS + iCANVAS_WIDTH), iCANVAS_START_Y_POS + iCANVAS_HEIGHT);
+ 
+    ctx.stroke();
+}
+
+function drawMapBackground(ctx) {
+	// Ocean blue colour!
+	ctx.fillStyle = "rgb(10, 133, 255)";
+
+	// Draw rectangle for the map
+	ctx.fillRect(iMAP_START_X_POS, iMAP_START_Y_POS, iMAP_WIDTH, iMAP_HEIGHT);
+
+}
+
+function drawGraticule(ctx) {
+	// Set distance between lines
+	var iDEGREES_BETWEEN_LAT_GRID_LINES = 10,
+		iDEGREES_BETWEEN_LON_GRID_LINES = 10;
+
+	// Style
+	ctx.lineWidth = 0.2;
+	ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
+	ctx.fillStyle = 'rgb(255,255,255)';
+
+	// Font styling
+	ctx.font = 'italic 10px sans-serif';
+	ctx.textBaseline = 'top';
+
+	drawLatitudeLines(ctx, iDEGREES_BETWEEN_LAT_GRID_LINES);
+	drawLongitudeLines(ctx, iDEGREES_BETWEEN_LON_GRID_LINES);
+}
+
+function drawLongitudeLines(ctx, iDEGREES_BETWEEN_GRID_LINES)
+{
+ 
+    var iNORTH_LATITUDE = 90;
+    var iSOUTH_LATITUDE = -90;
+ 
+    var iDegreesScreenY = 0;
+ 
+    // Iterate around the latitude axis at the given interval
+    for( iLineOfLatitude = iNORTH_LATITUDE; iLineOfLatitude >= iSOUTH_LATITUDE; iLineOfLatitude -= iDEGREES_BETWEEN_GRID_LINES)
+    {
+        // Convert the latitude value and move the pen to the start of the line
+        iDegreesScreenY = degreesOfLatitudeToScreenY(iLineOfLatitude);
+        ctx.moveTo(iMAP_START_X_POS, iDegreesScreenY);
+ 
+        // Plot the line
+        ctx.lineTo(iMAP_START_X_POS + iMAP_WIDTH, iDegreesScreenY);
+ 
+        // Put the label on the line
+        ctx.fillText(iLineOfLatitude, iCANVAS_START_X_POS + 5, iDegreesScreenY - 5);
+ 
+        ctx.stroke();
+ 
+    }
+}
+ 
+function drawLatitudeLines(ctx, iDEGREES_BETWEEN_GRID_LINES)
+{
+    var iMIN_LONGITUDE = -180;
+    var iMAX_LONGITUDE = 180;
+ 
+    var iDegreesScreenY = 0;
+ 
+    // Iterate around the longitude axis at the given intercal
+    for (iLineOfLongitude = iMIN_LONGITUDE; iLineOfLongitude <= iMAX_LONGITUDE; iLineOfLongitude += iDEGREES_BETWEEN_GRID_LINES) {
+        // Convert the longitude value and move the pen to the start of the line
+        iDegreesScreenX = degreesOfLongitudeToScreenX(iLineOfLongitude);
+        ctx.moveTo(iDegreesScreenX, iMAP_START_Y_POS);
+ 
+        // Plot the line
+        ctx.lineTo(iDegreesScreenX, iMAP_START_Y_POS + iMAP_HEIGHT);
+ 
+        // Put the label on the line
+        ctx.fillText(iLineOfLongitude, iDegreesScreenX - 10, iCANVAS_START_Y_POS + 10);
+ 
+        ctx.stroke();
+    }
+}
+
+function degreesOfLongitudeToScreenX(iDegreesOfLongitude) {
+    
+	// Make the value positive, so we can calculate the percentage
+	var iAdjustedDegreesOfLongitude = (iDegreesOfLongitude * 1) + 180,
+		iDegreesOfLongitudeToScreenX = 0;
+
+	// Are we at the West -180 point?
+	if (iAdjustedDegreesOfLongitude === 0) {
+		// Screen X is the left of the map (avoid divide by zero)
+		iDegreesOfLongitudeToScreenX = iMAP_START_X_POS;
+	} else if (iAdjustedDegreesOfLongitude > 360) {
+		// If the longitude crosses the 180 line fix it (doesn't translat to screen well)
+		iDegreesOfLongitudeToScreenX = iMAP_START_X_POS + iMAP_WIDTH;
+	} else {
+		// Convert the longitude value to screen X
+		iDegreesOfLongitudeToScreenX = (iMAP_START_X_POS + (iAdjustedDegreesOfLongitude * (iMAP_WIDTH / 360)));
+	}
+
+	return iDegreesOfLongitudeToScreenX;
+}
+
+function degreesOfLatitudeToScreenY(iDegreesOfLatitude) {
+	// Make the value positive, so we can calculate the percentage
+	var iAdjustedDegreesOfLatitude = (iDegreesOfLatitude * 1) + 90,
+		iDegreesOfLatitudeToScreenY = 0;
+
+	// Are we at the South pole?
+	if (iAdjustedDegreesOfLatitude === 0) {
+		// Screen Y is the botton of the map (avoid divide by zero)
+		iDegreesOfLatitudeToScreenY = iMAP_HEIGHT + iMAP_START_Y_POS;
+	} else if (iAdjustedDegreesOfLatitude > 180) {
+		// Are we at the North pole (or beyond)?
+		// Screen Y is the top of the map
+		iDegreesOfLatitudeToScreenY = iMAP_START_Y_POS;
+	} else {
+		// Convert the latitude value to screen X
+		iDegreesOfLatitudeToScreenY = (iMAP_HEIGHT - (iAdjustedDegreesOfLatitude * (iMAP_HEIGHT / 180)) + iMAP_START_Y_POS);
+	}
+
+	return iDegreesOfLatitudeToScreenY;
+}
+
+function draw()
+{
+    // Main entry point got the map canvas example
+    var canvas = document.getElementById('g-map');
+ 
+    // Canvas supported?
+    if(canvas.getContext)
+    {
+        var ctx = canvas.getContext('2d');
+ 
+        // Draw the background
+        drawBackground(ctx);
+ 
+        // Draw the map background
+        drawMapBackground(ctx)
+ 
+        // Draw the map background
+        drawGraticule(ctx);
+ 
+        // // Draw the land
+        // drawLandMass(ctx);
+ 
+        // // One-shot position request. (f supported)
+        // if (navigator.geolocation)
+        //     navigator.geolocation.getCurrentPosition(plotPosition);
+ 
+    }
+    else
+    {
+        alert("Canvas not supported!");
+    }
+}
+
+
+(function() {
+    "use strict";
+
+    var canvas = document.querySelector('canvas');
+    fitToContainer(canvas);
+
+    var event_list = document.getElementById("event_list");
+    var cmd_feedback = document.getElementById("cmd_feedback");
+
+    var input_cmd = document.getElementById("input_cmd");
+    input_cmd.addEventListener("change", function(e) {
+
+        cmd_feedback.innerText = "";
+
+        let is_valid_cmd = !isNaN(e.target.value);
+
+        if (is_valid_cmd) {
+            console.log("Execute command: %s", e.target.value);
+
+            var new_event = document.createElement("li");
+            new_event.appendChild(document.createTextNode(e.target.value));
+            //event_list.appendChild(new_event);
+            event_list.insertBefore(new_event, event_list.childNodes[0])
+        } else {
+            cmd_feedback.innerText = "Invalid command!";
+            window.setTimeout(function() {
+                cmd_feedback.innerText = "";
+            }, 1678);
+        }
+
+        e.target.value = ""; // clear input for next command
+    });
+
+    //draw();
+
+    window.onload = function() {
+        
+        var game = new Phaser.Game(640, 480, Phaser.CANVAS, "", {preload: onPreload, create: onCreate});                
+
+        var hexagonWidth = 80;
+        var hexagonHeight = 70;
+        var gridSizeX = 10;
+        var gridSizeY = 12;
+        var columns = [Math.ceil(gridSizeY/2),Math.floor(gridSizeY/2)];
+        var moveIndex;
+        var sectorWidth = hexagonWidth/4*3;
+        var sectorHeight = hexagonHeight;
+        var gradient = (hexagonWidth/4)/(hexagonHeight/2);
+        var marker;
+        var hexagonGroup;
+        
+        function onPreload() {
+            game.load.image("hexagon", "hexagon.png");
+            game.load.image("marker", "marker.png");
+        }
+
+        function onCreate() {
+            hexagonGroup = game.add.group();
+            game.stage.backgroundColor = "#ffffff"
+            for(var i = 0; i < gridSizeX/2; i ++){
+                for(var j = 0; j < gridSizeY; j ++){
+                    if(gridSizeX%2==0 || i+1<gridSizeX/2 || j%2==0){
+                        var hexagonX = hexagonWidth*i*1.5+(hexagonWidth/4*3)*(j%2);
+                        var hexagonY = hexagonHeight*j/2;	
+                        var hexagon = game.add.sprite(hexagonX,hexagonY,"hexagon");
+                        hexagonGroup.add(hexagon);
+                    }
+                }
+            }
+            hexagonGroup.y = (game.height-hexagonHeight*Math.ceil(gridSizeY/2))/2;
+            if(gridSizeY%2==0){
+                hexagonGroup.y-=hexagonHeight/4;
+            }
+            hexagonGroup.x = (game.width-Math.ceil(gridSizeX/2)*hexagonWidth-Math.floor(gridSizeX/2)*hexagonWidth/2)/2;
+            if(gridSizeX%2==0){
+                hexagonGroup.x-=hexagonWidth/8;
+            }
+            marker = game.add.sprite(0,0,"marker");
+            marker.anchor.setTo(0.5);
+            marker.visible=false;
+            hexagonGroup.add(marker);
+            moveIndex = game.input.addMoveCallback(checkHex, this);   		
+        }
+        
+        function checkHex(){
+            var candidateX = Math.floor((game.input.worldX-hexagonGroup.x)/sectorWidth);
+            var candidateY = Math.floor((game.input.worldY-hexagonGroup.y)/sectorHeight);
+            var deltaX = (game.input.worldX-hexagonGroup.x)%sectorWidth;
+            var deltaY = (game.input.worldY-hexagonGroup.y)%sectorHeight; 
+            if(candidateX%2==0){
+                if(deltaX<((hexagonWidth/4)-deltaY*gradient)){
+                        candidateX--;
+                        candidateY--;
+                }
+                if(deltaX<((-hexagonWidth/4)+deltaY*gradient)){
+                        candidateX--;
+                }
+            }    
+            else{
+                if(deltaY>=hexagonHeight/2){
+                        if(deltaX<(hexagonWidth/2-deltaY*gradient)){
+                            candidateX--;
+                        }
+                }
+                else{
+                        if(deltaX<deltaY*gradient){
+                            candidateX--;
+                        }
+                        else{
+                            candidateY--;
+                        }
+                }
+            }
+            placeMarker(candidateX,candidateY);
+        }
+        
+        function placeMarker(posX,posY){
+            if(posX<0 || posY<0 || posX>=gridSizeX || posY>columns[posX%2]-1){
+                marker.visible=false;
+            }
+            else{
+                marker.visible=true;
+                marker.x = hexagonWidth/4*3*posX+hexagonWidth/2;
+                marker.y = hexagonHeight*posY;
+                if(posX%2==0){
+                    marker.y += hexagonHeight/2;
+                }
+                else{
+                    marker.y += hexagonHeight;
+                }
+            }
+        }
+        
+    }
+
+}());
+</script>
+
+{% endblock %}
